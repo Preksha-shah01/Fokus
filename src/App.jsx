@@ -1,35 +1,40 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState, useEffect } from 'react';
+import Timer from './Timer';
+import History from './History';
 
 function App() {
-  const [count, setCount] = useState(0)
+  // Load history from LocalStorage so data isn't lost on refresh
+  const [history, setHistory] = useState(() => {
+    const saved = localStorage.getItem('focusHistory');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  // Save to LocalStorage whenever history updates
+  useEffect(() => {
+    localStorage.setItem('focusHistory', JSON.stringify(history));
+  }, [history]);
+
+  const addSession = (task, duration) => {
+    const newSession = {
+      task,
+      duration,
+      date: new Date().toISOString()
+    };
+    setHistory([newSession, ...history]);
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="min-h-screen flex flex-col items-center justify-center p-4">
+      <header className="mb-8 text-center text-white">
+        <h1 className="text-4xl font-bold mb-2 drop-shadow-md">Mindful Vault</h1>
+        <p className="opacity-90 font-light">Track your focus, build better habits.</p>
+      </header>
+      
+      <Timer onSessionComplete={addSession} />
+      
+      <History history={history} />
+    </div>
+  );
 }
 
-export default App
+export default App;
