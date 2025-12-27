@@ -36,7 +36,7 @@ function App() {
           </span>
         </h1>
         <p className="text-lg md:text-xl text-slate-600 font-medium max-w-2xl mx-auto leading-relaxed">
-          Master your workflow. <span className="text-indigo-600 font-bold">Build better habits.</span>
+          <span className="text-indigo-600 font-bold">Master your workflow.Build better habits.</span>
         </p>
       </header>
       
