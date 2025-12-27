@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 
-// New Colorful Stat Card
+// Reusable Colorful Stat Card Component
 const StatCard = ({ title, value, subtitle, gradient }) => (
   <div className={`p-6 rounded-2xl shadow-lg text-white transform transition-transform hover:scale-105 ${gradient}`}>
     <h3 className="text-white/80 text-sm font-bold uppercase tracking-wider mb-2">{title}</h3>
@@ -11,19 +11,28 @@ const StatCard = ({ title, value, subtitle, gradient }) => (
 
 const AnalyticsDashboard = ({ history }) => {
   const stats = useMemo(() => {
-    const now = new Date();
     const totalSessions = history.length;
+    
+    // Calculate total minutes actually worked
     const totalMinutes = history.reduce((acc, curr) => acc + curr.duration, 0);
+    
+    // NEW: Calculate total saved time (handling cases where savedTime might be undefined)
+    const totalSaved = history.reduce((acc, curr) => acc + (curr.savedTime || 0), 0);
+
     const avgSession = totalSessions ? Math.round(totalMinutes / totalSessions) : 0;
+    
+    // Calculate unique days for daily average
     const uniqueDays = new Set(history.map(s => new Date(s.date).toDateString()));
     const daysCount = uniqueDays.size || 1;
     const dailyAverage = Math.round(totalMinutes / daysCount);
+    
+    // Find longest session
     const longestSession = history.reduce((max, curr) => (curr.duration > max ? curr.duration : max), 0);
 
+    // Simple streak logic
     let streak = 0;
     const uniqueDates = Array.from(uniqueDays).map(d => new Date(d).getTime()).sort((a,b) => b-a);
-    // Simple streak logic placeholder
-    if (uniqueDates.length > 0) streak = 1; 
+    if (uniqueDates.length > 0) streak = 1; // Simplified streak for now
 
     const formatMin = (m) => `${m}m`;
 
@@ -35,6 +44,7 @@ const AnalyticsDashboard = ({ history }) => {
       dailyAverage: formatMin(dailyAverage),
       longestSession: formatMin(longestSession),
       streak,
+      totalSaved: formatMin(totalSaved), // Send the calculated saved time to UI
     };
   }, [history]);
 
@@ -83,11 +93,12 @@ const AnalyticsDashboard = ({ history }) => {
           subtitle="days on fire!"
           gradient="bg-gradient-to-br from-red-500 to-orange-600"
         />
+        {/* NEW: Updated Saved Time Card */}
         <StatCard
           title="Saved Time"
-          value="0m"
-          subtitle="coming soon"
-          gradient="bg-gradient-to-br from-gray-400 to-gray-500"
+          value={stats.totalSaved}
+          subtitle="efficiency bonus"
+          gradient="bg-gradient-to-br from-gray-500 to-slate-600"
         />
       </div>
     </div>

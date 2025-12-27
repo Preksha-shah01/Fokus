@@ -14,9 +14,10 @@ const Timer = ({ onSessionComplete }) => {
     } else if (timeLeft === 0 && isActive) {
       setIsActive(false);
       clearInterval(interval);
-      onSessionComplete(task, mode);
+      // Natural finish: 0 saved time
+      onSessionComplete(task, mode, 0); 
       const audio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
-      audio.play().catch(e => console.log("Audio play failed:", e));
+      audio.play().catch(e => console.log("Audio failed:", e));
       alert("Focus Session Complete!");
     }
     return () => clearInterval(interval);
@@ -47,6 +48,28 @@ const Timer = ({ onSessionComplete }) => {
     }
   };
 
+  // --- NEW: LOGIC FOR SAVED TIME ---
+  const handleDone = () => {
+    if (!task.trim()) return;
+    
+    setIsActive(false);
+    
+    // Calculate stats
+    const timeSpentSeconds = (mode * 60) - timeLeft;
+    const timeSpentMinutes = Math.ceil(timeSpentSeconds / 60); // Round up partial minutes
+    
+    const savedSeconds = timeLeft;
+    const savedMinutes = Math.floor(savedSeconds / 60); // Only count full saved minutes
+    
+    // Send 3 things: Task Name, Actual Time Worked, Time Saved
+    onSessionComplete(task, timeSpentMinutes, savedMinutes);
+    
+    // Reset for next time
+    setDuration(mode);
+    setTask('');
+    alert(`Great job! You saved ${savedMinutes} minutes!`);
+  };
+
   return (
     <div className="bg-white/90 backdrop-blur-xl p-8 rounded-3xl shadow-[0_20px_50px_rgba(8,_112,_184,_0.7)] w-full max-w-md text-center border border-white/50 mb-8 transform transition-all hover:scale-[1.01]">
       <h2 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 mb-6">Focus Session</h2>
@@ -73,7 +96,6 @@ const Timer = ({ onSessionComplete }) => {
         )}
       </div>
 
-      {/* The Colorful Clock */}
       <div className="text-8xl font-black mb-8 tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 drop-shadow-sm">
         {formatTime(timeLeft)}
       </div>
@@ -94,23 +116,31 @@ const Timer = ({ onSessionComplete }) => {
         ))}
       </div>
 
-      <div className="flex gap-4 justify-center">
+      <div className="flex gap-3 justify-center">
         <button 
           onClick={handleStart}
-          className={`w-36 py-4 rounded-full font-bold text-white shadow-xl transition-transform hover:scale-105 active:scale-95 text-lg ${
+          className={`w-32 py-4 rounded-full font-bold text-white shadow-xl transition-transform hover:scale-105 active:scale-95 text-lg ${
             isActive 
             ? 'bg-gradient-to-r from-rose-400 to-orange-400' 
             : 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500'
           }`}
         >
-          {isActive ? 'Pause' : 'Start Focus'}
+          {isActive ? 'Pause' : 'Start'}
         </button>
         
+        {/* NEW: FINISH EARLY BUTTON */}
+        <button 
+          onClick={handleDone}
+          className="w-32 py-4 rounded-full font-bold text-white shadow-xl transition-transform hover:scale-105 active:scale-95 text-lg bg-gradient-to-r from-emerald-400 to-teal-500"
+        >
+          Done
+        </button>
+
         <button 
           onClick={() => setDuration(mode)}
-          className="w-36 py-4 rounded-full font-bold bg-white text-gray-500 border border-gray-100 shadow-lg hover:bg-gray-50 hover:text-gray-700 transition-colors text-lg"
+          className="w-20 py-4 rounded-full font-bold bg-white text-gray-500 border border-gray-100 shadow-lg hover:bg-gray-50 transition-colors text-lg"
         >
-          Reset
+          ↺
         </button>
       </div>
     </div>
