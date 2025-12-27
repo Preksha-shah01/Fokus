@@ -3,8 +3,39 @@
 @tailwind utilities;
 
 body {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  /* Soft Purple to Pink - Matches your theme but 80% lighter */
+  background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+  background-image: linear-gradient(to top, #a18cd1 0%, #fbc2eb 100%);
+  /* We use an overlay to soften it */
+  background: linear-gradient(-45deg, #e0c3fc, #8ec5fc, #e0c3fc);
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
+
   min-height: 100vh;
   color: #1f2937;
   font-family: 'Inter', sans-serif;
+}
+
+@keyframes gradientBG {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes gradientBG {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Custom Scrollbar (Optional: Makes the scrollbar look premium) */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1); 
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.4); 
+  border-radius: 5px;
 }

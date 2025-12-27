@@ -26,12 +26,17 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-indigo-50 flex flex-col items-center p-8">
-      <header className="mb-12 text-center">
-        <h1 className="text-4xl font-bold text-gray-800 mb-2">Fokus</h1>
-        <p className="text-gray-600">Track your focus, build better habits.</p>
+    <div className="min-h-screen flex flex-col items-center p-8">
+      <header className="mb-12 text-center relative z-10">
+        <h1 className="text-6xl md:text-7xl font-black mb-4 tracking-tight">
+        <span className="bg-clip-text text-transparent bg-gradient-to-r from-violet-600 via-pink-500 to-orange-400 drop-shadow-sm">
+          FOKUS
+        </span>
+        </h1>
+        <p className="text-lg md:text-xl text-slate-600 font-medium max-w-2xl mx-auto leading-relaxed">
+          <span className="text-indigo-600 font-bold">Master your workflow. Build better habits.</span>
+        </p>
       </header>
-      
       {/* Main Content Grid */}
       <div className="w-full max-w-6xl flex flex-col md:flex-row gap-8 items-start">
         
