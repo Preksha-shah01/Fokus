@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 
 const Timer = ({ onSessionComplete }) => {
   const [task, setTask] = useState('');
-  const [timeLeft, setTimeLeft] = useState(25 * 60);
+  const [timeLeft, setTimeLeft] = useState(10 * 60);
   const [isActive, setIsActive] = useState(false);
-  const [mode, setMode] = useState(25);
+  const [mode, setMode] = useState(10);
   const [isError, setIsError] = useState(false);
 
   useEffect(() => {
