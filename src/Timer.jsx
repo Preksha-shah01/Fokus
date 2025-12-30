@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 
 const Timer = ({ onSessionComplete }) => {
   const [task, setTask] = useState('');
+  
+  // Default: 10 minutes (you can change 10 to 25 if you prefer)
   const [timeLeft, setTimeLeft] = useState(10 * 60);
   const [isActive, setIsActive] = useState(false);
   const [mode, setMode] = useState(10);
@@ -14,10 +16,7 @@ const Timer = ({ onSessionComplete }) => {
     } else if (timeLeft === 0 && isActive) {
       setIsActive(false);
       clearInterval(interval);
-      // Natural finish: 0 saved time
       onSessionComplete(task, mode, 0); 
-      const audio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
-      audio.play().catch(e => console.log("Audio failed:", e));
       alert("Focus Session Complete!");
     }
     return () => clearInterval(interval);
@@ -48,7 +47,6 @@ const Timer = ({ onSessionComplete }) => {
     }
   };
 
-  // --- NEW: LOGIC FOR SAVED TIME ---
   const handleDone = () => {
     if (!task.trim()) return;
     
@@ -56,15 +54,12 @@ const Timer = ({ onSessionComplete }) => {
     
     // Calculate stats
     const timeSpentSeconds = (mode * 60) - timeLeft;
-    const timeSpentMinutes = Math.ceil(timeSpentSeconds / 60); // Round up partial minutes
-    
+    const timeSpentMinutes = Math.ceil(timeSpentSeconds / 60); 
     const savedSeconds = timeLeft;
-    const savedMinutes = Math.floor(savedSeconds / 60); // Only count full saved minutes
+    const savedMinutes = Math.floor(savedSeconds / 60); 
     
-    // Send 3 things: Task Name, Actual Time Worked, Time Saved
     onSessionComplete(task, timeSpentMinutes, savedMinutes);
     
-    // Reset for next time
     setDuration(mode);
     setTask('');
     alert(`Great job! You saved ${savedMinutes} minutes!`);
@@ -128,7 +123,6 @@ const Timer = ({ onSessionComplete }) => {
           {isActive ? 'Pause' : 'Start'}
         </button>
         
-        {/* NEW: FINISH EARLY BUTTON */}
         <button 
           onClick={handleDone}
           className="w-32 py-4 rounded-full font-bold text-white shadow-xl transition-transform hover:scale-105 active:scale-95 text-lg bg-gradient-to-r from-emerald-400 to-teal-500"

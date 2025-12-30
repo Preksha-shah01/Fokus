@@ -1,104 +1,72 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import Timer from './Timer';
+import History from './History';
+import AnalyticsDashboard from './AnalyticsDashboard';
+import Soundscapes from './Soundscapes';
 
-// NEW LINKS: Using Mixkit Preview MP3s (High quality & Reliable)
-const sounds = [
-  { 
-    id: 'rain', 
-    label: 'Rain', 
-    icon: '🌧️', 
-    url: 'https://assets.mixkit.co/sfx/preview/mixkit-light-rain-loop-2393.mp3' 
-  },
-  { 
-    id: 'forest', 
-    label: 'Forest', 
-    icon: '🌲', 
-    url: 'https://assets.mixkit.co/sfx/preview/mixkit-forest-stream-loop-1210.mp3' 
-  },
-  { 
-    id: 'cafe', 
-    label: 'Cafe', 
-    icon: '☕', 
-    url: 'https://assets.mixkit.co/sfx/preview/mixkit-restaurant-crowd-talking-ambience-44.mp3' 
-  },
-  { 
-    id: 'fire', 
-    label: 'Fire', 
-    icon: '🔥', 
-    url: 'https://assets.mixkit.co/sfx/preview/mixkit-campfire-crackles-1330.mp3' 
-  }
-];
-
-const Soundscapes = () => {
-  const [activeSound, setActiveSound] = useState(null);
-  const audioRef = useRef(new Audio());
-
-  const toggleSound = (sound) => {
-    if (activeSound === sound.id) {
-      // Pause if clicking the currently playing sound
-      audioRef.current.pause();
-      setActiveSound(null);
-    } else {
-      // Stop any existing sound first
-      audioRef.current.pause();
-      
-      // Setup and play new sound
-      audioRef.current.src = sound.url;
-      audioRef.current.loop = true; 
-      audioRef.current.volume = 0.5;
-      
-      const playPromise = audioRef.current.play();
-      
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            setActiveSound(sound.id);
-          })
-          .catch((error) => {
-            console.error("Playback failed. Browser might be blocking autoplay.", error);
-            alert("Error playing sound. Please try clicking again.");
-            setActiveSound(null);
-          });
-      }
+function App() {
+  // Safe LocalStorage Loading
+  const [history, setHistory] = useState(() => {
+    try {
+      const saved = localStorage.getItem('focusHistory');
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      console.error("Failed to load history", e);
+      return [];
     }
+  });
+
+  // Save to LocalStorage whenever history updates
+  useEffect(() => {
+    localStorage.setItem('focusHistory', JSON.stringify(history));
+  }, [history]);
+
+  // Add session logic
+  const addSession = (task, duration, savedTime) => {
+    const newSession = {
+      task: task || "Focus Session",
+      duration,
+      savedTime: savedTime || 0,
+      date: new Date().toISOString()
+    };
+    setHistory([newSession, ...history]);
   };
 
-  useEffect(() => {
-    // Cleanup audio when component unmounts
-    return () => {
-      audioRef.current.pause();
-      audioRef.current.src = "";
-    };
-  }, []);
-
   return (
-    <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50">
-      <div className="bg-white/80 backdrop-blur-xl border border-white/50 shadow-2xl rounded-full px-6 py-3 flex gap-4 items-center transition-all hover:scale-105 hover:bg-white/90">
-        <span className="text-gray-400 text-xs font-bold uppercase tracking-widest mr-2 hidden md:block">
-          Zen Mode
-        </span>
+    <div className="min-h-screen flex flex-col items-center p-8 pb-32">
+      {/* The Gradient Header */}
+      <header className="mb-12 text-center relative z-10">
+        <h1 className="text-6xl md:text-7xl font-black mb-4 tracking-tight">
+          <span className="bg-clip-text text-transparent bg-gradient-to-r from-violet-600 via-pink-500 to-orange-400 drop-shadow-sm">
+            FOKUS
+          </span>
+        </h1>
+        <p className="text-lg md:text-xl text-slate-600 font-medium max-w-2xl mx-auto leading-relaxed">
+          Master your workflow. <span className="text-indigo-600 font-bold">Build better habits.</span>
+        </p>
+      </header>
+      
+      {/* Main Content Grid */}
+      <div className="w-full max-w-6xl flex flex-col md:flex-row gap-8 items-start">
         
-        {sounds.map((sound) => (
-          <button
-            key={sound.id}
-            onClick={() => toggleSound(sound)}
-            className={`p-3 rounded-full transition-all duration-300 flex items-center justify-center group relative ${
-              activeSound === sound.id 
-                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-300 scale-110' 
-                : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
-            }`}
-            title={`Play ${sound.label}`}
-          >
-            <span className="text-xl">{sound.icon}</span>
-            
-            {/* Pulsing indicator when active */}
-            {activeSound === sound.id && (
-              <span className="absolute -bottom-1 w-1 h-1 bg-white rounded-full animate-ping"></span>
-            )}
-          </button>
-        ))}
+        {/* Left Column: Timer & History */}
+        <div className="w-full md:w-1/3 flex flex-col gap-8">
+          <Timer onSessionComplete={addSession} />
+          <History history={history} />
+        </div>
+        
+        {/* Right Column: Analytics Dashboard */}
+        <div className="w-full md:w-2/3">
+          <AnalyticsDashboard history={history} />
+        </div>
+        
       </div>
+
+      {/* Zen Mode Bar */}
+      <Soundscapes />
+
     </div>
   );
-};
+}
 
-export default Soundscapes;
+export default App;

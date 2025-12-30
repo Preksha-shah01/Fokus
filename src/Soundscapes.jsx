@@ -5,25 +5,25 @@ const sounds = [
     id: 'rain', 
     label: 'Rain', 
     icon: '🌧️', 
-    url: 'https://actions.google.com/sounds/v1/weather/rain_heavy_loud.ogg' 
+    url: 'https://assets.mixkit.co/sfx/preview/mixkit-light-rain-loop-2393.mp3' 
   },
   { 
     id: 'forest', 
     label: 'Forest', 
     icon: '🌲', 
-    url: 'https://actions.google.com/sounds/v1/relax/river_sounds.ogg' 
+    url: 'https://assets.mixkit.co/sfx/preview/mixkit-forest-stream-loop-1210.mp3' 
   },
   { 
     id: 'cafe', 
     label: 'Cafe', 
     icon: '☕', 
-    url: 'https://actions.google.com/sounds/v1/ambiences/coffee_shop.ogg' 
+    url: 'https://assets.mixkit.co/sfx/preview/mixkit-restaurant-crowd-talking-ambience-44.mp3' 
   },
   { 
     id: 'fire', 
     label: 'Fire', 
     icon: '🔥', 
-    url: 'https://actions.google.com/sounds/v1/ambiences/fireplace.ogg' 
+    url: 'https://assets.mixkit.co/sfx/preview/mixkit-campfire-crackles-1330.mp3' 
   }
 ];
 
@@ -31,27 +31,32 @@ const Soundscapes = () => {
   const [activeSound, setActiveSound] = useState(null);
   const audioRef = useRef(new Audio());
 
-  // Handle Play/Pause
   const toggleSound = (sound) => {
     if (activeSound === sound.id) {
-      // If clicking the active one, stop it
       audioRef.current.pause();
       setActiveSound(null);
     } else {
-      // Play new sound
+      audioRef.current.pause();
       audioRef.current.src = sound.url;
-      audioRef.current.loop = true; // Make it repeat forever
-      audioRef.current.volume = 0.5; // Set volume to 50% so it's not too loud
-      audioRef.current.play().catch(e => console.log("Audio play error:", e));
-      setActiveSound(sessionStorage.id); // Typo fix in logic below
-      setActiveSound(sound.id);
+      audioRef.current.loop = true; 
+      audioRef.current.volume = 0.5;
+      
+      const playPromise = audioRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => setActiveSound(sound.id))
+          .catch((error) => {
+            console.error("Playback failed.", error);
+            setActiveSound(null);
+          });
+      }
     }
   };
 
-  // Cleanup when leaving the page
   useEffect(() => {
     return () => {
       audioRef.current.pause();
+      audioRef.current.src = "";
     };
   }, []);
 
@@ -75,12 +80,6 @@ const Soundscapes = () => {
           >
             <span className="text-xl">{sound.icon}</span>
             
-            {/* Tooltip on Hover */}
-            <span className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-              {sound.label}
-            </span>
-
-            {/* Visual Equalizer Animation when playing */}
             {activeSound === sound.id && (
               <span className="absolute -bottom-1 w-1 h-1 bg-white rounded-full animate-ping"></span>
             )}

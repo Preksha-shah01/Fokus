@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react';
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
-// Reusable Colorful Stat Card Component
 const StatCard = ({ title, value, subtitle, gradient }) => (
   <div className={`p-6 rounded-2xl shadow-lg text-white transform transition-transform hover:scale-105 ${gradient}`}>
     <h3 className="text-white/80 text-sm font-bold uppercase tracking-wider mb-2">{title}</h3>
@@ -11,7 +10,6 @@ const StatCard = ({ title, value, subtitle, gradient }) => (
 );
 
 const AnalyticsDashboard = ({ history }) => {
-  // 1. Calculate Stats
   const stats = useMemo(() => {
     const totalSessions = history.length;
     const totalMinutes = history.reduce((acc, curr) => acc + curr.duration, 0);
@@ -41,13 +39,12 @@ const AnalyticsDashboard = ({ history }) => {
     };
   }, [history]);
 
-  // 2. Prepare Data for the Graph (Last 7 Days)
   const chartData = useMemo(() => {
     const last7Days = [];
     for (let i = 6; i >= 0; i--) {
       const d = new Date();
       d.setDate(d.getDate() - i);
-      const dayName = d.toLocaleDateString('en-US', { weekday: 'short' }); // "Mon", "Tue"
+      const dayName = d.toLocaleDateString('en-US', { weekday: 'short' }); 
       const dateString = d.toDateString();
       
       const minutes = history
@@ -61,13 +58,11 @@ const AnalyticsDashboard = ({ history }) => {
 
   return (
     <>
-      {/* BOX 1: MAIN ANALYTICS CARDS */}
       <div className="bg-white/80 backdrop-blur-xl p-8 rounded-3xl shadow-2xl w-full border border-white/40 mb-8">
         <h2 className="text-3xl font-bold text-gray-800 mb-8 flex items-center gap-3">
           <span className="text-4xl">📊</span> Focus Analytics
         </h2>
 
-        {/* Grid of Colorful Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           <StatCard title="Total Focus" value={stats.totalMinutes} gradient="bg-gradient-to-br from-violet-500 to-purple-600" />
           <StatCard title="Sessions" value={stats.totalSessions} subtitle="completed" gradient="bg-gradient-to-br from-emerald-400 to-teal-500" />
@@ -80,7 +75,6 @@ const AnalyticsDashboard = ({ history }) => {
         </div>
       </div>
 
-      {/* BOX 2: WEEKLY ACTIVITY GRAPH (SEPARATE BOX) */}
       <div className="bg-white/80 backdrop-blur-xl p-8 rounded-3xl shadow-2xl w-full border border-white/40">
         <h3 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
            <span>📈</span> Weekly Activity
