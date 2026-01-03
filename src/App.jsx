@@ -5,23 +5,23 @@ import AnalyticsDashboard from './AnalyticsDashboard';
 import Soundscapes from './Soundscapes';
 
 function App() {
+  // 1. Dark Mode State
+  const [darkMode, setDarkMode] = useState(false);
+
   // Safe LocalStorage Loading
   const [history, setHistory] = useState(() => {
     try {
       const saved = localStorage.getItem('focusHistory');
       return saved ? JSON.parse(saved) : [];
     } catch (e) {
-      console.error("Failed to load history", e);
       return [];
     }
   });
 
-  // Save to LocalStorage whenever history updates
   useEffect(() => {
     localStorage.setItem('focusHistory', JSON.stringify(history));
   }, [history]);
 
-  // Add session logic
   const addSession = (task, duration, savedTime) => {
     const newSession = {
       task: task || "Focus Session",
@@ -32,39 +32,62 @@ function App() {
     setHistory([newSession, ...history]);
   };
 
+  // Toggle Function
+  const toggleTheme = () => setDarkMode(!darkMode);
+
   return (
-    <div className="min-h-screen flex flex-col items-center p-8 pb-32">
-      {/* The Gradient Header */}
-      <header className="mb-12 text-center relative z-10">
-        <h1 className="text-6xl md:text-7xl font-black mb-4 tracking-tight">
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-violet-600 via-pink-500 to-orange-400 drop-shadow-sm">
-            FOKUS
-          </span>
-        </h1>
-        <p className="text-lg md:text-xl text-slate-600 font-medium max-w-2xl mx-auto leading-relaxed">
-          Master your workflow. <span className="text-indigo-600 font-bold">Build better habits.</span>
-        </p>
-      </header>
+    // "dark" class enables Tailwind's dark mode features
+    <div className={darkMode ? "dark" : ""}>
       
-      {/* Main Content Grid */}
-      <div className="w-full max-w-6xl flex flex-col md:flex-row gap-8 items-start">
+      {/* Main Wrapper with Dynamic Background */}
+      <div className={`min-h-screen flex flex-col items-center p-8 pb-32 transition-colors duration-500 ${darkMode ? 'dark-mode-bg text-white' : 'light-mode-bg text-gray-800'}`}>
         
-        {/* Left Column: Timer & History */}
-        <div className="w-full md:w-1/3 flex flex-col gap-8">
-          <Timer onSessionComplete={addSession} />
-          <History history={history} />
+        {/* Header with Theme Toggle */}
+        <header className="mb-12 text-center relative z-10 w-full max-w-6xl flex flex-col md:flex-row items-center justify-between">
+            {/* Empty div to balance the flex layout */}
+            <div className="w-10 hidden md:block"></div>
+
+            <div className="text-center">
+                <h1 className="text-6xl md:text-7xl font-black mb-4 tracking-tight">
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-violet-600 via-pink-500 to-orange-400 drop-shadow-sm">
+                    FOKUS
+                </span>
+                </h1>
+                <p className={`text-lg md:text-xl font-medium max-w-2xl mx-auto leading-relaxed ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+                Master your workflow. <span className="text-indigo-600 font-bold">Build better habits.</span>
+                </p>
+            </div>
+
+            {/* THEME TOGGLE BUTTON */}
+            <button 
+                onClick={toggleTheme}
+                className="mt-6 md:mt-0 p-3 rounded-full bg-white/20 backdrop-blur-md border border-white/30 hover:bg-white/30 transition-all shadow-lg"
+                title="Toggle Dark Mode"
+            >
+                {darkMode ? '🌙' : '☀️'}
+            </button>
+        </header>
+        
+        {/* Main Content Grid */}
+        <div className="w-full max-w-6xl flex flex-col md:flex-row gap-8 items-start">
+          
+          {/* Left Column */}
+          <div className="w-full md:w-1/3 flex flex-col gap-8">
+            <Timer onSessionComplete={addSession} />
+            <History history={history} />
+          </div>
+          
+          {/* Right Column */}
+          <div className="w-full md:w-2/3">
+            <AnalyticsDashboard history={history} />
+          </div>
+          
         </div>
-        
-        {/* Right Column: Analytics Dashboard */}
-        <div className="w-full md:w-2/3">
-          <AnalyticsDashboard history={history} />
-        </div>
-        
+
+        {/* Zen Mode Bar */}
+        <Soundscapes />
+
       </div>
-
-      {/* Zen Mode Bar */}
-      <Soundscapes />
-
     </div>
   );
 }

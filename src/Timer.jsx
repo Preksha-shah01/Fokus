@@ -2,8 +2,6 @@ import React, { useState, useEffect } from 'react';
 
 const Timer = ({ onSessionComplete }) => {
   const [task, setTask] = useState('');
-  
-  // Default: 10 minutes (you can change 10 to 25 if you prefer)
   const [timeLeft, setTimeLeft] = useState(10 * 60);
   const [isActive, setIsActive] = useState(false);
   const [mode, setMode] = useState(10);
@@ -35,48 +33,38 @@ const Timer = ({ onSessionComplete }) => {
   };
 
   const handleStart = () => {
-    if (isActive) {
-      setIsActive(false);
-    } else {
-      if (!task.trim()) {
-        setIsError(true);
-        return;
-      }
-      setIsError(false);
-      setIsActive(true);
+    if (isActive) setIsActive(false);
+    else {
+      if (!task.trim()) { setIsError(true); return; }
+      setIsError(false); setIsActive(true);
     }
   };
 
   const handleDone = () => {
     if (!task.trim()) return;
-    
     setIsActive(false);
-    
-    // Calculate stats
-    const timeSpentSeconds = (mode * 60) - timeLeft;
-    const timeSpentMinutes = Math.ceil(timeSpentSeconds / 60); 
-    const savedSeconds = timeLeft;
-    const savedMinutes = Math.floor(savedSeconds / 60); 
-    
+    const timeSpentMinutes = Math.ceil(((mode * 60) - timeLeft) / 60); 
+    const savedMinutes = Math.floor(timeLeft / 60); 
     onSessionComplete(task, timeSpentMinutes, savedMinutes);
-    
     setDuration(mode);
     setTask('');
     alert(`Great job! You saved ${savedMinutes} minutes!`);
   };
 
   return (
-    <div className="bg-white/90 backdrop-blur-xl p-8 rounded-3xl shadow-[0_20px_50px_rgba(8,_112,_184,_0.7)] w-full max-w-md text-center border border-white/50 mb-8 transform transition-all hover:scale-[1.01]">
+    // DARK MODE: bg-slate-800, border-slate-700
+    <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-xl p-8 rounded-3xl shadow-[0_20px_50px_rgba(8,_112,_184,_0.7)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)] w-full max-w-md text-center border border-white/50 dark:border-slate-600 mb-8 transform transition-all hover:scale-[1.01]">
       <h2 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 mb-6">Focus Session</h2>
       
       <div className="relative mb-8">
         <input 
           type="text" 
           placeholder="What are you working on?" 
-          className={`w-full bg-white/50 border-2 rounded-2xl p-4 text-lg outline-none transition-all placeholder-gray-400 font-medium ${
+          // DARK MODE: Input background darker
+          className={`w-full bg-white/50 dark:bg-slate-700/50 border-2 rounded-2xl p-4 text-lg outline-none transition-all placeholder-gray-400 dark:placeholder-slate-400 font-medium dark:text-white ${
             isError 
-              ? 'border-red-400 ring-4 ring-red-100' 
-              : 'border-white focus:border-purple-300 focus:ring-4 focus:ring-purple-100'
+              ? 'border-red-400 ring-4 ring-red-100 dark:ring-red-900' 
+              : 'border-white dark:border-slate-600 focus:border-purple-300 focus:ring-4 focus:ring-purple-100 dark:focus:ring-purple-900'
           }`}
           value={task}
           onChange={(e) => {
@@ -85,9 +73,7 @@ const Timer = ({ onSessionComplete }) => {
           }}
         />
         {isError && (
-          <p className="absolute -bottom-6 left-1 text-rose-600 text-xs font-bold animate-bounce">
-            ⚠️ Please enter a goal to start!
-          </p>
+          <p className="absolute -bottom-6 left-1 text-rose-600 font-bold animate-bounce text-xs">⚠️ Please enter a goal!</p>
         )}
       </div>
 
@@ -102,8 +88,8 @@ const Timer = ({ onSessionComplete }) => {
             onClick={() => setDuration(min)}
             className={`px-4 py-2 rounded-xl text-sm font-bold transition-all transform hover:-translate-y-1 ${
               mode === min 
-              ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-200' 
-              : 'bg-white text-gray-500 hover:bg-gray-50 shadow-sm'
+              ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-200 dark:shadow-none' 
+              : 'bg-white dark:bg-slate-700 text-gray-500 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-600 shadow-sm'
             }`}
           >
             {min}m
@@ -132,7 +118,7 @@ const Timer = ({ onSessionComplete }) => {
 
         <button 
           onClick={() => setDuration(mode)}
-          className="w-20 py-4 rounded-full font-bold bg-white text-gray-500 border border-gray-100 shadow-lg hover:bg-gray-50 transition-colors text-lg"
+          className="w-20 py-4 rounded-full font-bold bg-white dark:bg-slate-700 text-gray-500 dark:text-slate-300 border border-gray-100 dark:border-slate-600 shadow-lg hover:bg-gray-50 dark:hover:bg-slate-600 transition-colors text-lg"
         >
           ↺
         </button>

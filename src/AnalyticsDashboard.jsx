@@ -58,8 +58,8 @@ const AnalyticsDashboard = ({ history }) => {
 
   return (
     <>
-      <div className="bg-white/80 backdrop-blur-xl p-8 rounded-3xl shadow-2xl w-full border border-white/40 mb-8">
-        <h2 className="text-3xl font-bold text-gray-800 mb-8 flex items-center gap-3">
+      <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl p-8 rounded-3xl shadow-2xl w-full border border-white/40 dark:border-slate-600 mb-8 transition-colors">
+        <h2 className="text-3xl font-bold text-gray-800 dark:text-white mb-8 flex items-center gap-3">
           <span className="text-4xl">📊</span> Focus Analytics
         </h2>
 
@@ -75,8 +75,8 @@ const AnalyticsDashboard = ({ history }) => {
         </div>
       </div>
 
-      <div className="bg-white/80 backdrop-blur-xl p-8 rounded-3xl shadow-2xl w-full border border-white/40">
-        <h3 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+      <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl p-8 rounded-3xl shadow-2xl w-full border border-white/40 dark:border-slate-600 transition-colors">
+        <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-6 flex items-center gap-2">
            <span>📈</span> Weekly Activity
         </h3>
         
