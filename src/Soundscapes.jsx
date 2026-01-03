@@ -1,29 +1,31 @@
 import React, { useState, useRef, useEffect } from 'react';
 
+// FIXED: Using local files from the 'public' folder.
+// Since you downloaded them, these will NEVER break!
 const sounds = [
   { 
     id: 'rain', 
     label: 'Rain', 
     icon: '🌧️', 
-    url: 'https://assets.mixkit.co/sfx/preview/mixkit-light-rain-loop-2393.mp3' 
+    url: '/rain.mp3' 
   },
   { 
     id: 'forest', 
     label: 'Forest', 
     icon: '🌲', 
-    url: 'https://assets.mixkit.co/sfx/preview/mixkit-forest-stream-loop-1210.mp3' 
+    url: '/forest.mp3' 
   },
   { 
     id: 'cafe', 
     label: 'Cafe', 
     icon: '☕', 
-    url: 'https://assets.mixkit.co/sfx/preview/mixkit-restaurant-crowd-talking-ambience-44.mp3' 
+    url: '/cafe.mp3' 
   },
   { 
     id: 'fire', 
     label: 'Fire', 
     icon: '🔥', 
-    url: 'https://assets.mixkit.co/sfx/preview/mixkit-campfire-crackles-1330.mp3' 
+    url: '/fire.mp3' 
   }
 ];
 
@@ -33,20 +35,26 @@ const Soundscapes = () => {
 
   const toggleSound = (sound) => {
     if (activeSound === sound.id) {
+      // Pause if clicking the currently playing sound
       audioRef.current.pause();
       setActiveSound(null);
     } else {
+      // Stop any existing sound first
       audioRef.current.pause();
+      
+      // Setup and play new sound
       audioRef.current.src = sound.url;
       audioRef.current.loop = true; 
       audioRef.current.volume = 0.5;
       
+      // Play
       const playPromise = audioRef.current.play();
       if (playPromise !== undefined) {
         playPromise
           .then(() => setActiveSound(sound.id))
           .catch((error) => {
-            console.error("Playback failed.", error);
+            console.error("Playback failed:", error);
+            alert("Could not play sound. Make sure rain.mp3 is in the public folder!");
             setActiveSound(null);
           });
       }
@@ -79,7 +87,6 @@ const Soundscapes = () => {
             title={`Play ${sound.label}`}
           >
             <span className="text-xl">{sound.icon}</span>
-            
             {activeSound === sound.id && (
               <span className="absolute -bottom-1 w-1 h-1 bg-white rounded-full animate-ping"></span>
             )}
