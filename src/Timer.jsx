@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import confetti from 'canvas-confetti'; // <--- 1. Import the confetti library
 
 const Timer = ({ onSessionComplete }) => {
   const [task, setTask] = useState('');
@@ -6,6 +7,34 @@ const Timer = ({ onSessionComplete }) => {
   const [isActive, setIsActive] = useState(false);
   const [mode, setMode] = useState(10);
   const [isError, setIsError] = useState(false);
+
+  // 2. The Celebration Function
+  const triggerConfetti = () => {
+    const end = Date.now() + 1000; // Celebrate for 1 second
+
+    const colors = ['#a786ff', '#fd8bbc', '#eca184', '#f8deb1'];
+
+    (function frame() {
+      confetti({
+        particleCount: 6,
+        angle: 60,
+        spread: 55,
+        origin: { x: 0 },
+        colors: colors
+      });
+      confetti({
+        particleCount: 6,
+        angle: 120,
+        spread: 55,
+        origin: { x: 1 },
+        colors: colors
+      });
+
+      if (Date.now() < end) {
+        requestAnimationFrame(frame);
+      }
+    }());
+  };
 
   useEffect(() => {
     let interval = null;
@@ -15,7 +44,7 @@ const Timer = ({ onSessionComplete }) => {
       setIsActive(false);
       clearInterval(interval);
       onSessionComplete(task, mode, 0); 
-      alert("Focus Session Complete!");
+      triggerConfetti(); // <--- Trigger when time runs out!
     }
     return () => clearInterval(interval);
   }, [isActive, timeLeft, task, mode, onSessionComplete]);
@@ -43,16 +72,22 @@ const Timer = ({ onSessionComplete }) => {
   const handleDone = () => {
     if (!task.trim()) return;
     setIsActive(false);
-    const timeSpentMinutes = Math.ceil(((mode * 60) - timeLeft) / 60); 
-    const savedMinutes = Math.floor(timeLeft / 60); 
+    
+    // Calculate stats
+    const timeSpentSeconds = (mode * 60) - timeLeft;
+    const timeSpentMinutes = Math.ceil(timeSpentSeconds / 60); 
+    const savedSeconds = timeLeft;
+    const savedMinutes = Math.floor(savedSeconds / 60); 
+    
     onSessionComplete(task, timeSpentMinutes, savedMinutes);
+    
     setDuration(mode);
     setTask('');
-    alert(`Great job! You saved ${savedMinutes} minutes!`);
+    
+    triggerConfetti(); // <--- Trigger when clicked manually!
   };
 
   return (
-    // DARK MODE: bg-slate-800, border-slate-700
     <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-xl p-8 rounded-3xl shadow-[0_20px_50px_rgba(8,_112,_184,_0.7)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)] w-full max-w-md text-center border border-white/50 dark:border-slate-600 mb-8 transform transition-all hover:scale-[1.01]">
       <h2 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 mb-6">Focus Session</h2>
       
@@ -60,7 +95,6 @@ const Timer = ({ onSessionComplete }) => {
         <input 
           type="text" 
           placeholder="What are you working on?" 
-          // DARK MODE: Input background darker
           className={`w-full bg-white/50 dark:bg-slate-700/50 border-2 rounded-2xl p-4 text-lg outline-none transition-all placeholder-gray-400 dark:placeholder-slate-400 font-medium dark:text-white ${
             isError 
               ? 'border-red-400 ring-4 ring-red-100 dark:ring-red-900' 
