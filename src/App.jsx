@@ -3,6 +3,7 @@ import Timer from './Timer';
 import History from './History';
 import AnalyticsDashboard from './AnalyticsDashboard';
 import Soundscapes from './Soundscapes';
+import Motivation from './Motivation'; // <--- Import the new Quote component
 
 function App() {
   // 1. Dark Mode State
@@ -43,12 +44,12 @@ function App() {
       <div className={`min-h-screen flex flex-col items-center p-8 pb-32 transition-colors duration-500 ${darkMode ? 'dark-mode-bg text-white' : 'light-mode-bg text-gray-800'}`}>
         
         {/* Header with Theme Toggle */}
-        <header className="mb-12 text-center relative z-10 w-full max-w-6xl flex flex-col md:flex-row items-center justify-between">
+        <header className="mb-4 text-center relative z-10 w-full max-w-6xl flex flex-col md:flex-row items-center justify-between">
             {/* Empty div to balance the flex layout */}
             <div className="w-10 hidden md:block"></div>
 
             <div className="text-center">
-                <h1 className="text-6xl md:text-7xl font-black mb-4 tracking-tight">
+                <h1 className="text-6xl md:text-7xl font-black mb-2 tracking-tight">
                 <span className="bg-clip-text text-transparent bg-gradient-to-r from-violet-600 via-pink-500 to-orange-400 drop-shadow-sm">
                     FOKUS
                 </span>
@@ -67,6 +68,9 @@ function App() {
                 {darkMode ? '🌙' : '☀️'}
             </button>
         </header>
+
+        {/* ✨ NEW: Motivation Quote Component */}
+        <Motivation />
         
         {/* Main Content Grid */}
         <div className="w-full max-w-6xl flex flex-col md:flex-row gap-8 items-start">
