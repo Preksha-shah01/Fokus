@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Toaster } from 'react-hot-toast'; // <--- 1. Import Toaster
+import { Toaster, toast } from 'react-hot-toast'; // Ensure toast is imported
 import Timer from './Timer';
 import History from './History';
 import AnalyticsDashboard from './AnalyticsDashboard';
@@ -32,13 +32,24 @@ function App() {
     setHistory([newSession, ...history]);
   };
 
+  // ✨ NEW: Function to wipe data
+  const clearHistory = () => {
+    if (history.length === 0) return;
+    
+    // Simple confirmation
+    if (window.confirm("Are you sure you want to delete all history?")) {
+      setHistory([]);
+      localStorage.removeItem('focusHistory');
+      toast.success("History cleared!");
+    }
+  };
+
   const toggleTheme = () => setDarkMode(!darkMode);
 
   return (
     <div className={darkMode ? "dark" : ""}>
       <div className={`min-h-screen flex flex-col items-center p-8 pb-32 transition-colors duration-500 ${darkMode ? 'dark-mode-bg text-white' : 'light-mode-bg text-gray-800'}`}>
         
-        {/* 2. Add the Toaster here. This handles the popups! */}
         <Toaster 
           position="top-center"
           toastOptions={{
@@ -75,8 +86,11 @@ function App() {
         <div className="w-full max-w-6xl flex flex-col md:flex-row gap-8 items-start">
           <div className="w-full md:w-1/3 flex flex-col gap-8">
             <Timer onSessionComplete={addSession} />
-            <History history={history} />
+            
+            {/* ✨ UPDATE: Pass the clearHistory function to History */}
+            <History history={history} onClear={clearHistory} />
           </div>
+          
           <div className="w-full md:w-2/3">
             <AnalyticsDashboard history={history} />
           </div>

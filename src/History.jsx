@@ -1,6 +1,6 @@
 import React from 'react';
 
-const History = ({ history }) => {
+const History = ({ history, onClear }) => {
   const totalMinutes = history.reduce((acc, sess) => acc + sess.duration, 0);
   
   return (
@@ -27,10 +27,26 @@ const History = ({ history }) => {
 
       </div>
 
-      <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-2xl p-4 shadow-sm border border-white/40 dark:border-slate-600 max-h-56 overflow-y-auto custom-scrollbar">
-        <h3 className="font-bold text-gray-700 dark:text-slate-200 mb-2 sticky top-0 bg-transparent text-[10px] uppercase tracking-wider pl-1">
-          Recent History
-        </h3>
+      <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-2xl p-4 shadow-sm border border-white/40 dark:border-slate-600 max-h-56 overflow-y-auto custom-scrollbar relative">
+        
+        {/* Header Row with Clear Button */}
+        <div className="flex justify-between items-center mb-3 sticky top-0 bg-transparent z-10">
+            <h3 className="font-bold text-gray-700 dark:text-slate-200 text-[10px] uppercase tracking-wider pl-1">
+            Recent History
+            </h3>
+
+            {/* ✨ UPDATED BUTTON: Better Visibility */}
+            {history.length > 0 && (
+                <button 
+                    onClick={onClear}
+                    className="flex items-center gap-1 bg-red-50 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/40 text-red-600 dark:text-red-400 px-2.5 py-1 rounded-lg transition-colors border border-red-100 dark:border-red-900/50 shadow-sm"
+                    title="Clear All History"
+                >
+                    <span className="text-[10px] font-bold uppercase tracking-wide">🗑️ Clear</span>
+                </button>
+            )}
+        </div>
+
         {history.length === 0 ? (
           <p className="text-gray-400 text-center text-xs py-2">No sessions yet.</p>
         ) : (
