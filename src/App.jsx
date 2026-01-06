@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Toaster, toast } from 'react-hot-toast'; // Ensure toast is imported
+import { Toaster, toast } from 'react-hot-toast';
 import Timer from './Timer';
 import History from './History';
 import AnalyticsDashboard from './AnalyticsDashboard';
@@ -32,16 +32,21 @@ function App() {
     setHistory([newSession, ...history]);
   };
 
-  // ✨ NEW: Function to wipe data
   const clearHistory = () => {
     if (history.length === 0) return;
-    
-    // Simple confirmation
     if (window.confirm("Are you sure you want to delete all history?")) {
       setHistory([]);
       localStorage.removeItem('focusHistory');
       toast.success("History cleared!");
     }
+  };
+
+  // ✨ NEW: Function to delete just ONE specific session
+  const deleteSession = (indexToDelete) => {
+    // Create a new list that keeps everything EXCEPT the one we clicked
+    const newHistory = history.filter((_, index) => index !== indexToDelete);
+    setHistory(newHistory);
+    toast.success("Session removed");
   };
 
   const toggleTheme = () => setDarkMode(!darkMode);
@@ -87,8 +92,12 @@ function App() {
           <div className="w-full md:w-1/3 flex flex-col gap-8">
             <Timer onSessionComplete={addSession} />
             
-            {/* ✨ UPDATE: Pass the clearHistory function to History */}
-            <History history={history} onClear={clearHistory} />
+            {/* ✨ UPDATE: Pass the deleteSession function down */}
+            <History 
+                history={history} 
+                onClear={clearHistory} 
+                onDelete={deleteSession} 
+            />
           </div>
           
           <div className="w-full md:w-2/3">

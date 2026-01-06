@@ -1,6 +1,7 @@
 import React from 'react';
 
-const History = ({ history, onClear }) => {
+// ✨ UPDATE: Accept 'onDelete' prop
+const History = ({ history, onClear, onDelete }) => {
   const totalMinutes = history.reduce((acc, sess) => acc + sess.duration, 0);
   
   return (
@@ -29,20 +30,18 @@ const History = ({ history, onClear }) => {
 
       <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-2xl p-4 shadow-sm border border-white/40 dark:border-slate-600 max-h-56 overflow-y-auto custom-scrollbar relative">
         
-        {/* Header Row with Clear Button */}
         <div className="flex justify-between items-center mb-3 sticky top-0 bg-transparent z-10">
             <h3 className="font-bold text-gray-700 dark:text-slate-200 text-[10px] uppercase tracking-wider pl-1">
             Recent History
             </h3>
 
-            {/* ✨ UPDATED BUTTON: Better Visibility */}
             {history.length > 0 && (
                 <button 
                     onClick={onClear}
                     className="flex items-center gap-1 bg-red-50 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/40 text-red-600 dark:text-red-400 px-2.5 py-1 rounded-lg transition-colors border border-red-100 dark:border-red-900/50 shadow-sm"
                     title="Clear All History"
                 >
-                    <span className="text-[10px] font-bold uppercase tracking-wide">🗑️ Clear</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wide">🗑️ Clear All</span>
                 </button>
             )}
         </div>
@@ -52,11 +51,34 @@ const History = ({ history, onClear }) => {
         ) : (
           <ul className="space-y-2">
             {history.map((session, idx) => (
-              <li key={idx} className="flex justify-between items-center text-xs border-b border-gray-200/40 dark:border-slate-600/40 pb-2 last:border-0 hover:bg-white/40 dark:hover:bg-slate-700/50 p-1.5 rounded-lg transition-all">
-                <span className="font-semibold text-slate-700 dark:text-slate-200 truncate max-w-[60%]">{session.task || "Untitled"}</span>
-                <span className="text-slate-500 dark:text-slate-400 text-[10px] font-medium bg-white/50 dark:bg-slate-700 px-1.5 py-0.5 rounded-md">
-                  {session.duration}m
-                </span>
+              <li key={idx} className="flex justify-between items-center text-xs border-b border-gray-200/40 dark:border-slate-600/40 pb-2 last:border-0 hover:bg-white/40 dark:hover:bg-slate-700/50 p-1.5 rounded-lg transition-all group">
+                
+                {/* Task Name */}
+                <div className="flex-1 min-w-0 pr-2">
+                   <span className="font-semibold text-slate-700 dark:text-slate-200 truncate block">
+                     {session.task || "Untitled"}
+                   </span>
+                </div>
+
+                {/* Right Side: Duration + Delete Button */}
+                <div className="flex items-center gap-2">
+                    <span className="text-slate-500 dark:text-slate-400 text-[10px] font-medium bg-white/50 dark:bg-slate-700 px-1.5 py-0.5 rounded-md whitespace-nowrap">
+                    {session.duration}m
+                    </span>
+
+                    {/* ✨ NEW: Delete Single Item Button */}
+                    <button 
+                        onClick={(e) => {
+                            e.stopPropagation(); // Stop clicking the row from doing anything else
+                            onDelete(idx);
+                        }}
+                        className="text-gray-300 hover:text-red-500 dark:text-gray-600 dark:hover:text-red-400 transition-colors p-1 rounded-full hover:bg-red-50 dark:hover:bg-red-900/20"
+                        title="Delete this session"
+                    >
+                        ✕
+                    </button>
+                </div>
+
               </li>
             ))}
           </ul>
