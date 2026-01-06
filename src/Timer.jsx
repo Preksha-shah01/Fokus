@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import confetti from 'canvas-confetti'; // <--- 1. Import the confetti library
+import confetti from 'canvas-confetti'; 
+import toast from 'react-hot-toast'; // <--- 1. Import toast
 
 const Timer = ({ onSessionComplete }) => {
   const [task, setTask] = useState('');
@@ -8,31 +9,13 @@ const Timer = ({ onSessionComplete }) => {
   const [mode, setMode] = useState(10);
   const [isError, setIsError] = useState(false);
 
-  // 2. The Celebration Function
   const triggerConfetti = () => {
-    const end = Date.now() + 1000; // Celebrate for 1 second
-
+    const end = Date.now() + 1000;
     const colors = ['#a786ff', '#fd8bbc', '#eca184', '#f8deb1'];
-
     (function frame() {
-      confetti({
-        particleCount: 6,
-        angle: 60,
-        spread: 55,
-        origin: { x: 0 },
-        colors: colors
-      });
-      confetti({
-        particleCount: 6,
-        angle: 120,
-        spread: 55,
-        origin: { x: 1 },
-        colors: colors
-      });
-
-      if (Date.now() < end) {
-        requestAnimationFrame(frame);
-      }
+      confetti({ particleCount: 6, angle: 60, spread: 55, origin: { x: 0 }, colors: colors });
+      confetti({ particleCount: 6, angle: 120, spread: 55, origin: { x: 1 }, colors: colors });
+      if (Date.now() < end) requestAnimationFrame(frame);
     }());
   };
 
@@ -44,7 +27,13 @@ const Timer = ({ onSessionComplete }) => {
       setIsActive(false);
       clearInterval(interval);
       onSessionComplete(task, mode, 0); 
-      triggerConfetti(); // <--- Trigger when time runs out!
+      triggerConfetti();
+      
+      // 2. Use Toast instead of alert
+      toast.success("Session Complete! Great work! 🎉");
+      
+      // Play a ding sound
+      new Audio('https://assets.mixkit.co/sfx/preview/mixkit-happy-bells-notification-937.mp3').play().catch(e => console.log(e));
     }
     return () => clearInterval(interval);
   }, [isActive, timeLeft, task, mode, onSessionComplete]);
@@ -64,7 +53,12 @@ const Timer = ({ onSessionComplete }) => {
   const handleStart = () => {
     if (isActive) setIsActive(false);
     else {
-      if (!task.trim()) { setIsError(true); return; }
+      if (!task.trim()) { 
+        setIsError(true); 
+        // 3. Error Toast
+        toast.error("Please enter a goal first!");
+        return; 
+      }
       setIsError(false); setIsActive(true);
     }
   };
@@ -72,19 +66,15 @@ const Timer = ({ onSessionComplete }) => {
   const handleDone = () => {
     if (!task.trim()) return;
     setIsActive(false);
-    
-    // Calculate stats
-    const timeSpentSeconds = (mode * 60) - timeLeft;
-    const timeSpentMinutes = Math.ceil(timeSpentSeconds / 60); 
-    const savedSeconds = timeLeft;
-    const savedMinutes = Math.floor(savedSeconds / 60); 
-    
+    const timeSpentMinutes = Math.ceil(((mode * 60) - timeLeft) / 60); 
+    const savedMinutes = Math.floor(timeLeft / 60); 
     onSessionComplete(task, timeSpentMinutes, savedMinutes);
-    
     setDuration(mode);
     setTask('');
+    triggerConfetti();
     
-    triggerConfetti(); // <--- Trigger when clicked manually!
+    // 4. Success Toast
+    toast.success(`Saved ${savedMinutes} minutes! nicely done.`);
   };
 
   return (
@@ -106,9 +96,6 @@ const Timer = ({ onSessionComplete }) => {
             if(e.target.value.trim()) setIsError(false);
           }}
         />
-        {isError && (
-          <p className="absolute -bottom-6 left-1 text-rose-600 font-bold animate-bounce text-xs">⚠️ Please enter a goal!</p>
-        )}
       </div>
 
       <div className="text-8xl font-black mb-8 tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 drop-shadow-sm">

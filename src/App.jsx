@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import { Toaster } from 'react-hot-toast'; // <--- 1. Import Toaster
 import Timer from './Timer';
 import History from './History';
 import AnalyticsDashboard from './AnalyticsDashboard';
 import Soundscapes from './Soundscapes';
-import Motivation from './Motivation'; // <--- Import the new Quote component
+import Motivation from './Motivation';
 
 function App() {
-  // 1. Dark Mode State
   const [darkMode, setDarkMode] = useState(false);
 
-  // Safe LocalStorage Loading
   const [history, setHistory] = useState(() => {
     try {
       const saved = localStorage.getItem('focusHistory');
@@ -33,21 +32,25 @@ function App() {
     setHistory([newSession, ...history]);
   };
 
-  // Toggle Function
   const toggleTheme = () => setDarkMode(!darkMode);
 
   return (
-    // "dark" class enables Tailwind's dark mode features
     <div className={darkMode ? "dark" : ""}>
-      
-      {/* Main Wrapper with Dynamic Background */}
       <div className={`min-h-screen flex flex-col items-center p-8 pb-32 transition-colors duration-500 ${darkMode ? 'dark-mode-bg text-white' : 'light-mode-bg text-gray-800'}`}>
         
-        {/* Header with Theme Toggle */}
-        <header className="mb-4 text-center relative z-10 w-full max-w-6xl flex flex-col md:flex-row items-center justify-between">
-            {/* Empty div to balance the flex layout */}
-            <div className="w-10 hidden md:block"></div>
+        {/* 2. Add the Toaster here. This handles the popups! */}
+        <Toaster 
+          position="top-center"
+          toastOptions={{
+            style: {
+              background: darkMode ? '#334155' : '#fff',
+              color: darkMode ? '#fff' : '#333',
+            },
+          }}
+        />
 
+        <header className="mb-4 text-center relative z-10 w-full max-w-6xl flex flex-col md:flex-row items-center justify-between">
+            <div className="w-10 hidden md:block"></div>
             <div className="text-center">
                 <h1 className="text-6xl md:text-7xl font-black mb-2 tracking-tight">
                 <span className="bg-clip-text text-transparent bg-gradient-to-r from-violet-600 via-pink-500 to-orange-400 drop-shadow-sm">
@@ -58,8 +61,6 @@ function App() {
                 Master your workflow. <span className="text-indigo-600 font-bold">Build better habits.</span>
                 </p>
             </div>
-
-            {/* THEME TOGGLE BUTTON */}
             <button 
                 onClick={toggleTheme}
                 className="mt-6 md:mt-0 p-3 rounded-full bg-white/20 backdrop-blur-md border border-white/30 hover:bg-white/30 transition-all shadow-lg"
@@ -69,26 +70,18 @@ function App() {
             </button>
         </header>
 
-        {/* ✨ NEW: Motivation Quote Component */}
         <Motivation />
         
-        {/* Main Content Grid */}
         <div className="w-full max-w-6xl flex flex-col md:flex-row gap-8 items-start">
-          
-          {/* Left Column */}
           <div className="w-full md:w-1/3 flex flex-col gap-8">
             <Timer onSessionComplete={addSession} />
             <History history={history} />
           </div>
-          
-          {/* Right Column */}
           <div className="w-full md:w-2/3">
             <AnalyticsDashboard history={history} />
           </div>
-          
         </div>
 
-        {/* Zen Mode Bar */}
         <Soundscapes />
 
       </div>
