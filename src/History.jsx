@@ -1,6 +1,5 @@
 import React from 'react';
 
-// ✨ UPDATE: Accept 'onDelete' prop
 const History = ({ history, onClear, onDelete }) => {
   const totalMinutes = history.reduce((acc, sess) => acc + sess.duration, 0);
   

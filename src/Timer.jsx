@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import confetti from 'canvas-confetti'; 
-import toast from 'react-hot-toast'; // <--- 1. Import toast
+import toast from 'react-hot-toast'; 
 
 const Timer = ({ onSessionComplete }) => {
   const [task, setTask] = useState('');
@@ -8,6 +8,28 @@ const Timer = ({ onSessionComplete }) => {
   const [isActive, setIsActive] = useState(false);
   const [mode, setMode] = useState(10);
   const [isError, setIsError] = useState(false);
+
+  // Helper to format time (e.g., 600 -> "10:00")
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}`;
+  };
+
+  // ✨ NEW: Smart Browser Tab Title (The "Multitasker")
+  useEffect(() => {
+    if (isActive) {
+      document.title = `(${formatTime(timeLeft)}) Fokus`;
+    } else {
+      document.title = "Fokus | Zen Productivity Timer";
+    }
+
+    // Cleanup: Reset title when component unmounts or timer stops
+    return () => {
+      document.title = "Fokus | Zen Productivity Timer";
+    };
+  }, [isActive, timeLeft]);
+
 
   const triggerConfetti = () => {
     const end = Date.now() + 1000;
@@ -28,21 +50,12 @@ const Timer = ({ onSessionComplete }) => {
       clearInterval(interval);
       onSessionComplete(task, mode, 0); 
       triggerConfetti();
-      
-      // 2. Use Toast instead of alert
       toast.success("Session Complete! Great work! 🎉");
       
-      // Play a ding sound
       new Audio('https://assets.mixkit.co/sfx/preview/mixkit-happy-bells-notification-937.mp3').play().catch(e => console.log(e));
     }
     return () => clearInterval(interval);
   }, [isActive, timeLeft, task, mode, onSessionComplete]);
-
-  const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}`;
-  };
 
   const setDuration = (minutes) => {
     setMode(minutes);
@@ -55,7 +68,6 @@ const Timer = ({ onSessionComplete }) => {
     else {
       if (!task.trim()) { 
         setIsError(true); 
-        // 3. Error Toast
         toast.error("Please enter a goal first!");
         return; 
       }
@@ -72,8 +84,6 @@ const Timer = ({ onSessionComplete }) => {
     setDuration(mode);
     setTask('');
     triggerConfetti();
-    
-    // 4. Success Toast
     toast.success(`Saved ${savedMinutes} minutes! nicely done.`);
   };
 
