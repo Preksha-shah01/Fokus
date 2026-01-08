@@ -8,6 +8,9 @@ import Motivation from './Motivation';
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
+  
+  // ✨ NEW: State to track if we are in fullscreen
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   const [history, setHistory] = useState(() => {
     try {
@@ -41,15 +44,30 @@ function App() {
     }
   };
 
-  // ✨ NEW: Function to delete just ONE specific session
   const deleteSession = (indexToDelete) => {
-    // Create a new list that keeps everything EXCEPT the one we clicked
     const newHistory = history.filter((_, index) => index !== indexToDelete);
     setHistory(newHistory);
     toast.success("Session removed");
   };
 
   const toggleTheme = () => setDarkMode(!darkMode);
+
+  // ✨ NEW: Function to toggle Fullscreen
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().then(() => {
+        setIsFullscreen(true);
+        toast.success("Entered Zen Mode");
+      }).catch((err) => {
+        toast.error(`Error enabling fullscreen: ${err.message}`);
+      });
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+        setIsFullscreen(false);
+      }
+    }
+  };
 
   return (
     <div className={darkMode ? "dark" : ""}>
@@ -66,7 +84,9 @@ function App() {
         />
 
         <header className="mb-4 text-center relative z-10 w-full max-w-6xl flex flex-col md:flex-row items-center justify-between">
-            <div className="w-10 hidden md:block"></div>
+            {/* Empty div for balance */}
+            <div className="w-20 hidden md:block"></div>
+
             <div className="text-center">
                 <h1 className="text-6xl md:text-7xl font-black mb-2 tracking-tight">
                 <span className="bg-clip-text text-transparent bg-gradient-to-r from-violet-600 via-pink-500 to-orange-400 drop-shadow-sm">
@@ -77,13 +97,27 @@ function App() {
                 Master your workflow. <span className="text-indigo-600 font-bold">Build better habits.</span>
                 </p>
             </div>
-            <button 
-                onClick={toggleTheme}
-                className="mt-6 md:mt-0 p-3 rounded-full bg-white/20 backdrop-blur-md border border-white/30 hover:bg-white/30 transition-all shadow-lg"
-                title="Toggle Dark Mode"
-            >
-                {darkMode ? '🌙' : '☀️'}
-            </button>
+
+            {/* Buttons Container */}
+            <div className="mt-6 md:mt-0 flex gap-3 justify-center md:justify-end w-20">
+                {/* ✨ NEW: Fullscreen Button */}
+                <button 
+                    onClick={toggleFullscreen}
+                    className="p-3 rounded-full bg-white/20 backdrop-blur-md border border-white/30 hover:bg-white/30 transition-all shadow-lg"
+                    title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
+                >
+                    {isFullscreen ? '↘' : '⛶'}
+                </button>
+
+                {/* Dark Mode Button */}
+                <button 
+                    onClick={toggleTheme}
+                    className="p-3 rounded-full bg-white/20 backdrop-blur-md border border-white/30 hover:bg-white/30 transition-all shadow-lg"
+                    title="Toggle Dark Mode"
+                >
+                    {darkMode ? '🌙' : '☀️'}
+                </button>
+            </div>
         </header>
 
         <Motivation />
@@ -91,8 +125,6 @@ function App() {
         <div className="w-full max-w-6xl flex flex-col md:flex-row gap-8 items-start">
           <div className="w-full md:w-1/3 flex flex-col gap-8">
             <Timer onSessionComplete={addSession} />
-            
-            {/* ✨ UPDATE: Pass the deleteSession function down */}
             <History 
                 history={history} 
                 onClear={clearHistory} 
