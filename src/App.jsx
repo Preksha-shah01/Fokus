@@ -8,9 +8,10 @@ import Motivation from './Motivation';
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
-  
-  // ✨ NEW: State to track if we are in fullscreen
   const [isFullscreen, setIsFullscreen] = useState(false);
+  
+  // ✨ NEW: State for "Focus View" (Minimal Mode)
+  const [isMinimal, setIsMinimal] = useState(false);
 
   const [history, setHistory] = useState(() => {
     try {
@@ -52,7 +53,6 @@ function App() {
 
   const toggleTheme = () => setDarkMode(!darkMode);
 
-  // ✨ NEW: Function to toggle Fullscreen
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen().then(() => {
@@ -66,6 +66,14 @@ function App() {
         document.exitFullscreen();
         setIsFullscreen(false);
       }
+    }
+  };
+
+  // ✨ NEW: Toggle function for Minimal Mode
+  const toggleMinimal = () => {
+    setIsMinimal(!isMinimal);
+    if (!isMinimal) {
+        toast.success("Distractions hidden");
     }
   };
 
@@ -84,8 +92,7 @@ function App() {
         />
 
         <header className="mb-4 text-center relative z-10 w-full max-w-6xl flex flex-col md:flex-row items-center justify-between">
-            {/* Empty div for balance */}
-            <div className="w-20 hidden md:block"></div>
+            <div className="w-32 hidden md:block"></div>
 
             <div className="text-center">
                 <h1 className="text-6xl md:text-7xl font-black mb-2 tracking-tight">
@@ -93,14 +100,27 @@ function App() {
                     FOKUS
                 </span>
                 </h1>
-                <p className={`text-lg md:text-xl font-medium max-w-2xl mx-auto leading-relaxed ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>
-                Master your workflow. <span className="text-indigo-600 font-bold">Build better habits.</span>
-                </p>
+                
+                {/* Hide subtitle in minimal mode to be extra clean */}
+                {!isMinimal && (
+                    <p className={`text-lg md:text-xl font-medium max-w-2xl mx-auto leading-relaxed ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+                    Master your workflow. <span className="text-indigo-600 font-bold">Build better habits.</span>
+                    </p>
+                )}
             </div>
 
             {/* Buttons Container */}
-            <div className="mt-6 md:mt-0 flex gap-3 justify-center md:justify-end w-20">
-                {/* ✨ NEW: Fullscreen Button */}
+            <div className="mt-6 md:mt-0 flex gap-3 justify-center md:justify-end w-32">
+                
+                {/* ✨ NEW: Focus View Toggle */}
+                <button 
+                    onClick={toggleMinimal}
+                    className={`p-3 rounded-full backdrop-blur-md border hover:bg-white/30 transition-all shadow-lg ${isMinimal ? 'bg-indigo-500 text-white border-indigo-400' : 'bg-white/20 border-white/30'}`}
+                    title={isMinimal ? "Show Dashboard" : "Hide Distractions"}
+                >
+                    {isMinimal ? '👁️' : '🕶️'}
+                </button>
+
                 <button 
                     onClick={toggleFullscreen}
                     className="p-3 rounded-full bg-white/20 backdrop-blur-md border border-white/30 hover:bg-white/30 transition-all shadow-lg"
@@ -109,7 +129,6 @@ function App() {
                     {isFullscreen ? '↘' : '⛶'}
                 </button>
 
-                {/* Dark Mode Button */}
                 <button 
                     onClick={toggleTheme}
                     className="p-3 rounded-full bg-white/20 backdrop-blur-md border border-white/30 hover:bg-white/30 transition-all shadow-lg"
@@ -120,21 +139,35 @@ function App() {
             </div>
         </header>
 
-        <Motivation />
+        {/* Hide Quote in Minimal Mode */}
+        {!isMinimal && <Motivation />}
         
-        <div className="w-full max-w-6xl flex flex-col md:flex-row gap-8 items-start">
-          <div className="w-full md:w-1/3 flex flex-col gap-8">
+        {/* Main Content Grid */}
+        <div className={`w-full max-w-6xl flex flex-col md:flex-row gap-8 items-start transition-all duration-500 ${isMinimal ? 'justify-center mt-10' : ''}`}>
+          
+          {/* Left Column (Timer & History) */}
+          {/* In Minimal Mode, we center this div and hide the History component */}
+          <div className={`flex flex-col gap-8 transition-all duration-500 ${isMinimal ? 'w-full md:w-1/2 lg:w-1/3' : 'w-full md:w-1/3'}`}>
             <Timer onSessionComplete={addSession} />
-            <History 
-                history={history} 
-                onClear={clearHistory} 
-                onDelete={deleteSession} 
-            />
+            
+            {/* HIDE History if isMinimal is true */}
+            <div className={`transition-all duration-500 ${isMinimal ? 'opacity-0 h-0 overflow-hidden' : 'opacity-100'}`}>
+                <History 
+                    history={history} 
+                    onClear={clearHistory} 
+                    onDelete={deleteSession} 
+                />
+            </div>
           </div>
           
-          <div className="w-full md:w-2/3">
-            <AnalyticsDashboard history={history} />
-          </div>
+          {/* Right Column (Analytics) */}
+          {/* HIDE entire column if isMinimal is true */}
+          {!isMinimal && (
+            <div className="w-full md:w-2/3 fade-in">
+                <AnalyticsDashboard history={history} />
+            </div>
+          )}
+          
         </div>
 
         <Soundscapes />
