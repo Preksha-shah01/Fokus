@@ -9,27 +9,28 @@ const Timer = ({ onSessionComplete }) => {
   const [mode, setMode] = useState(10);
   const [isError, setIsError] = useState(false);
 
-  // Helper to format time (e.g., 600 -> "10:00")
+  // ✨ NEW: Calculate the real-world time when the timer will end
+  const finishTime = new Date(Date.now() + timeLeft * 1000).toLocaleTimeString([], { 
+    hour: '2-digit', 
+    minute: '2-digit' 
+  });
+
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}`;
   };
 
-  // ✨ NEW: Smart Browser Tab Title (The "Multitasker")
   useEffect(() => {
     if (isActive) {
       document.title = `(${formatTime(timeLeft)}) Fokus`;
     } else {
       document.title = "Fokus | Zen Productivity Timer";
     }
-
-    // Cleanup: Reset title when component unmounts or timer stops
     return () => {
       document.title = "Fokus | Zen Productivity Timer";
     };
   }, [isActive, timeLeft]);
-
 
   const triggerConfetti = () => {
     const end = Date.now() + 1000;
@@ -108,8 +109,15 @@ const Timer = ({ onSessionComplete }) => {
         />
       </div>
 
-      <div className="text-8xl font-black mb-8 tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 drop-shadow-sm">
+      <div className="text-8xl font-black mb-2 tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 drop-shadow-sm">
         {formatTime(timeLeft)}
+      </div>
+
+      {/* ✨ NEW: "Finish At" Display */}
+      <div className="mb-8 h-6">
+        <p className="text-slate-400 dark:text-slate-500 font-semibold text-sm uppercase tracking-widest animate-pulse">
+            🔔 Finish at {finishTime}
+        </p>
       </div>
 
       <div className="flex justify-center gap-3 mb-10">
